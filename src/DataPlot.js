@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function DataPlot() {
+export default function DataPlot({xData, yData, xLabel, yLabel}) {
     const theme = useTheme();
 
     const classes = useStyles(theme);
@@ -32,8 +32,8 @@ export default function DataPlot() {
             className={classes.plot}
             data={[
                 {
-                    x: [1, 2, 3],
-                    y: [2, 6, 3],
+                    x: xData,
+                    y: yData,
                     type: 'scatter',
                     mode: 'lines+markers',
                     marker: { color: 'blue' },
@@ -49,7 +49,7 @@ export default function DataPlot() {
                 },
                 xaxis: {
                     title: {
-                        text: 'x Axis',
+                        text: xLabel,
                         font: {
                             color: theme.palette.getContrastText(theme.palette.background.paper)
                         }
@@ -60,7 +60,7 @@ export default function DataPlot() {
                 },
                 yaxis: {
                     title: {
-                        text: 'y Axis',
+                        text: yLabel,
                         font: {
                             color: theme.palette.getContrastText(theme.palette.background.paper)
                         },
@@ -69,7 +69,7 @@ export default function DataPlot() {
                         color: theme.palette.getContrastText(theme.palette.background.paper)
                     },
                 },
-                plot_bgcolor: theme.palette.primary.contrastText,
+                plot_bgcolor: theme.palette.getContrastText('#00f'),
                 paper_bgcolor: theme.palette.background.paper
             }}
             config={{

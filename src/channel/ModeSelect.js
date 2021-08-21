@@ -24,9 +24,9 @@ export default function ModeSelect(props) {
                     <em>Off</em>
                 </MenuItem>
                 <MenuItem value={"FixedCurrent"}>Fixed Current</MenuItem>
-                <MenuItem value={"SweepCurrent"}>Sweep Current</MenuItem>
+                {!props.fixedModeOnly && <MenuItem value={"SweepCurrent"}>Sweep Current</MenuItem>}
                 <MenuItem value={"FixedVoltage"}>Fixed Voltage</MenuItem>
-                <MenuItem value={"SweepVoltage"}>Sweep Voltage</MenuItem>
+                {!props.fixedModeOnly && <MenuItem value={"SweepVoltage"}>Sweep Voltage</MenuItem>}
             </Select>
         </FormControl>
     );

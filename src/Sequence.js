@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Card, CardContent, Container, Grid, IconButton, makeStyles, Paper } from '@material-ui/core';
 import MeasurementTab from './MeasurementTab';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
@@ -6,6 +6,10 @@ import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import UndoIcon from '@material-ui/icons/Undo';
 import RedoIcon from '@material-ui/icons/Redo';
 import { v4 as uuidv4 } from 'uuid';
+import Topbar from './Topbar';
+import environment from './util/environment';
+
+import Experimenter from './util/experimenter';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -41,6 +45,11 @@ export default function Sequence() {
         return {
             id: uuidv4(),
             pauseHere: false,
+            smuAMode: environment.SMU_MODE_OFF,
+            smuBMode: environment.SMU_MODE_OFF,
+            smuAParameters: {},
+            smuBParameters: {},
+            wait: 100
         }
     }
 
@@ -54,14 +63,46 @@ export default function Sequence() {
         setMeasurements(measurements.filter((x, i) => i != index));
     }
 
-    function handleMeasurementChange(index, name, value) {
-        setMeasurements(measurements.map((measurement, i) => (
-            i === index ? { ...measurement, name: value } : measurement
-        )));
+
+    const handleMeasurementChange = (index, name, value) => {
+        setMeasurements((measurements) => measurements.map((measurement, i) => {
+            if (i !== index) return measurement;
+            else {
+                const newMeasurement = { ...measurement, [name]: value };
+                if (newMeasurement.smuAMode !== measurement.smuAMode) {
+                    newMeasurement.smuAParameters = {};
+                }
+                if (newMeasurement.smuBMode !== measurement.smuBMode) {
+                    newMeasurement.smuBParameters = {};
+                }
+                return newMeasurement;
+            }
+        }));
+    };
+
+    const [availableAddresses, setAvailableAddresses] = useState(["GPIB0::26::INSTR"]);
+
+    const [keithley2636Address, setKeithley2636Address] = useState(environment.DEFAULT_KEITHLEY_2636_ADDRESS);
+
+    async function startMeasurements() {
+        for (let i = 0; i < measurements.length; i++) {
+            const experimenter = new Experimenter(
+                'http://localhost:8888/controller',
+                keithley2636Address,
+                measurements[i]
+            );
+            const result = await experimenter.start();
+            handleMeasurementChange(i, 'result', result);
+        }
     }
 
     return (
         <>
+            <Topbar
+                availableAddresses={availableAddresses}
+                keithley2636Address={keithley2636Address}
+                setKeithley2636Address={setKeithley2636Address}
+            />
             <Container className={classes.wrapper}>
                 <Grid container className={classes.sequenceContainer} spacing={3} justifyContent="center" alignItems="center" >
                     <Grid container className={classes.sequenceGrid} spacing={3} justifyContent="center" alignItems="center" >
@@ -69,7 +110,7 @@ export default function Sequence() {
                             measurements.map((measurement, i) => (
                                 <Grid key={measurement.id} item xs={12} sm={10} md={9} lg={8} >
                                     <MeasurementTab
-                                        {...measurements}
+                                        {...measurement}
                                         remove={() => removeMeasurement(i)}
                                         handleChange={(name, value) => handleMeasurementChange(i, name, value)}
                                     />
@@ -87,10 +128,10 @@ export default function Sequence() {
                     <IconButton>
                         <RedoIcon color="primary" fontSize="large" />
                     </IconButton>
-                    <IconButton onClick={addMeasurement}>
+                    <IconButton onClick={addMeasurement} >
                         <AddCircleOutlineIcon color="primary" fontSize="large" />
                     </IconButton>
-                    <IconButton>
+                    <IconButton onClick={startMeasurements} >
                         <PlayCircleOutlineIcon color="primary" fontSize="large" />
                     </IconButton>
                 </Paper>

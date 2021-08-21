@@ -7,17 +7,17 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 
 
 function App() {
-  const theme = createTheme({
-    palette: {
-      type: 'dark',
-    },
-  });
+    const theme = createTheme({
+        palette: {
+            type: 'dark',
+        },
+    });
 
-  return (
-    <ThemeProvider theme={theme}>
-      <Sequence />
-    </ThemeProvider>
-  );
+    return (
+        <ThemeProvider theme={theme}>
+            <Sequence />
+        </ThemeProvider>
+    );
 }
 
 export default App;

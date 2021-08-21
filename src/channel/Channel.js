@@ -35,21 +35,17 @@ function OffChannel() {
 function FixedCurrentChannel(props) {
     const classes = useStyles();
 
-    const [values, setValues] = useState({
-        value: '',
-    });
-
     const handleChange = (prop) => (event) => {
-        setValues({ ...values, [prop]: event.target.value });
-    };   
+        props.setParameters({...props.parameters, [prop]: event.target.value})
+    }; 
 
     return (
         <Grid container spacing={1} justifyContent="center">
             <Grid item className={classes.item} xs={12}>
                 <FormControl variant="filled">
                     <CircuitInput
-                        value={values.start}
-                        onChange={handleChange('start')}
+                        value={props.parameters.value || ''}
+                        onChange={handleChange('value')}
                         label="Value"
                         unit="A"
                     />
@@ -62,14 +58,8 @@ function FixedCurrentChannel(props) {
 function SweepCurrentChannel(props) {
     const classes = useStyles();
 
-    const [values, setValues] = useState({
-        start: '',
-        end: '',
-        step: ''
-    });
-
     const handleChange = (prop) => (event) => {
-        setValues({ ...values, [prop]: event.target.value });
+        props.setParameters({...props.parameters, [prop]: event.target.value})
     };   
 
     return (
@@ -77,7 +67,7 @@ function SweepCurrentChannel(props) {
             <Grid item className={classes.item} xs={12}>
                 <FormControl variant="filled">
                     <CircuitInput
-                        value={values.start}
+                        value={props.parameters.start || ''}
                         onChange={handleChange('start')}
                         label="Start"
                         unit="A"
@@ -87,7 +77,7 @@ function SweepCurrentChannel(props) {
             <Grid item className={classes.item} xs={12}>
                 <FormControl variant="filled">
                     <CircuitInput
-                        value={values.end}
+                        value={props.parameters.end || ''}
                         onChange={handleChange('end')}
                         label="End"
                         unit="A"
@@ -97,7 +87,7 @@ function SweepCurrentChannel(props) {
             <Grid item className={classes.item} xs={12}>
                 <FormControl variant="filled">
                     <CircuitInput
-                        value={values.step}
+                        value={props.parameters.step || ''}
                         onChange={handleChange('step')}
                         label="Step"
                         unit="A"
@@ -111,21 +101,17 @@ function SweepCurrentChannel(props) {
 function FixedVoltageChannel(props) {
     const classes = useStyles();
 
-    const [values, setValues] = useState({
-        value: '',
-    });
-
     const handleChange = (prop) => (event) => {
-        setValues({ ...values, [prop]: event.target.value });
-    };   
+        props.setParameters({...props.parameters, [prop]: event.target.value})
+    }; 
 
     return (
         <Grid container spacing={1} justifyContent="center">
             <Grid item className={classes.item} xs={12}>
                 <FormControl variant="filled">
                     <CircuitInput
-                        value={values.start}
-                        onChange={handleChange('start')}
+                        value={props.parameters.value || ''}
+                        onChange={handleChange('value')}
                         label="Value"
                         unit="V"
                     />
@@ -138,14 +124,8 @@ function FixedVoltageChannel(props) {
 function SweepVoltageChannel(props) {
     const classes = useStyles();
 
-    const [values, setValues] = useState({
-        start: '',
-        end: '',
-        step: ''
-    });
-
     const handleChange = (prop) => (event) => {
-        setValues({ ...values, [prop]: event.target.value });
+        props.setParameters({...props.parameters, [prop]: event.target.value})
     };   
 
     return (
@@ -153,7 +133,7 @@ function SweepVoltageChannel(props) {
             <Grid item className={classes.item} xs={12}>
                 <FormControl variant="filled">
                     <CircuitInput
-                        value={values.start}
+                        value={props.parameters.start || ''}
                         onChange={handleChange('start')}
                         label="Start"
                         unit="V"
@@ -163,7 +143,7 @@ function SweepVoltageChannel(props) {
             <Grid item className={classes.item} xs={12}>
                 <FormControl variant="filled">
                     <CircuitInput
-                        value={values.end}
+                        value={props.parameters.end || ''}
                         onChange={handleChange('end')}
                         label="End"
                         unit="V"
@@ -173,7 +153,7 @@ function SweepVoltageChannel(props) {
             <Grid item className={classes.item} xs={12}>
                 <FormControl variant="filled">
                     <CircuitInput
-                        value={values.step}
+                        value={props.parameters.step || ''}
                         onChange={handleChange('step')}
                         label="Step"
                         unit="V"
@@ -187,22 +167,20 @@ function SweepVoltageChannel(props) {
 export default function Channel(props) {
     const classes = useStyles();
 
-    const [mode, setMode] = useState("Off");
-
     function channel() {
-        switch (mode) {
+        switch (props.mode) {
             case "Off":
-                return <OffChannel />;
+                return <OffChannel parameters={props.parameters} setParameters={props.setParameters} />;
             case "FixedCurrent":
-                return <FixedCurrentChannel />;
+                return <FixedCurrentChannel parameters={props.parameters} setParameters={props.setParameters} />;
             case "SweepCurrent":
-                return <SweepCurrentChannel />;
+                return <SweepCurrentChannel parameters={props.parameters} setParameters={props.setParameters} />;
             case "FixedVoltage":
-                return <FixedVoltageChannel />;
+                return <FixedVoltageChannel parameters={props.parameters} setParameters={props.setParameters} />;
             case "SweepVoltage":
-                return <SweepVoltageChannel />;
+                return <SweepVoltageChannel parameters={props.parameters} setParameters={props.setParameters} />;
             default:
-                return <></>;
+                return <Typography>Unknown Mode</Typography>;
         }
     }
 
@@ -214,7 +192,7 @@ export default function Channel(props) {
                 </Typography>
             </Grid>
             <Grid item className={classes.mode} xs={12} sm={9} md={8} lg={9}>
-                <ModeSelect mode={mode} setMode={setMode} />
+                <ModeSelect mode={props.mode} setMode={props.setMode} fixedModeOnly={props.fixedModeOnly} />
             </Grid>
             {channel()}
         </Grid>
